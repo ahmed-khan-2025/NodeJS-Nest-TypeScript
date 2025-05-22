@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Movie Manager</title>
+   <!-- Link to external CSS file -->
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial; margin: 2rem; }
+    input, button { margin: 0.25rem; }
+    table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Movie Manager</h1>
+
+  <form id="movieForm">
+    <input type="hidden" id="movieId" />
+    <input type="text" id="title" placeholder="Title" required />
+    <input type="text" id="director" placeholder="Director" required />
+    <input type="number" id="year" placeholder="Year" required />
+    <button type="submit">Save</button>
+    <button type="button" onclick="resetForm()">Cancel</button>
+  </form>
+
+  <h2>Movies</h2>
+  <table>
+    <thead>
+      <tr><th>Title</th><th>Director</th><th>Year</th><th>Actions</th></tr>
+    </thead>
+    <tbody id="movieList"></tbody>
+  </table>
+
+  <script>
+    const apiUrl = '/movies';
+
+    async function fetchMovies() {
+      const res = await fetch(apiUrl);
+      const movies = await res.json();
+      const list = document.getElementById('movieList');
+      list.innerHTML = movies.map(m => `
+        <tr>
+          <td>${m.title}</td>
+          <td>${m.director}</td>
+          <td>${m.year}</td>
+          <td>
+            <button class="edit" onclick='editMovie(${JSON.stringify(m)})'>✏️</button>
+            <button class="delete" onclick='deleteMovie(${m.id})'>🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('movieForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = document.getElementById('movieId').value;
+      const movie = {
+        title: document.getElementById('title').value,
+        director: document.getElementById('director').value,
+        year: parseInt(document.getElementById('year').value),
+      };
+
+      if (id) {
+        await fetch(`${apiUrl}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(movie),
+        });
+      } else {
+        await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(movie),
+        });
+      }
+
+      resetForm();
+      fetchMovies();
+    });
+
+    function editMovie(movie) {
+      document.getElementById('movieId').value = movie.id;
+      document.getElementById('title').value = movie.title;
+      document.getElementById('director').value = movie.director;
+      document.getElementById('year').value = movie.year;
+    }
+
+    async function deleteMovie(id) {
+      if (confirm('Delete this movie?')) {
+        await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+        fetchMovies();
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('movieForm').reset();
+      document.getElementById('movieId').value = '';
+    }
+
+    fetchMovies();
+  </script>
+</body>
+</html>
