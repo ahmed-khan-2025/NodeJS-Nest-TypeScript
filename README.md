@@ -1,10 +1,10 @@
 # NodeJS-Nest-TypeScript
 ## 🎬 Movie App (NestJS + Express + SQLite)
-This is a simple full-stack movie management application built with:\
+This is a simple full-stack movie management application built with:
 
-- **Backend:** NestJS with Express adapter\
-- **Database:** SQLite using `better-sqlite3`\
-- **Frontend:** Vanilla HTML/CSS/JS served statically\
+- **Backend:** NestJS with Express adapter
+- **Database:** SQLite using `better-sqlite3`
+- **Frontend:** Vanilla HTML/CSS/JS served statically
 
 It supports basic CRUD operations (Create, Read, Update, Delete) on movie records.
 ## 💾 Technologies Used
